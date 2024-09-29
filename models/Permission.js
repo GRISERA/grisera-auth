@@ -19,6 +19,6 @@ const PermissionSchema = new mongoose.Schema({
     },
 });
 
-PermissionSchema.index({ userId: 1, datasetId: '1' }, { unique: true });
+PermissionSchema.index({ userId: 1, datasetId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Permission', PermissionSchema);
