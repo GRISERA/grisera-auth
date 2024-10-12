@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const morgan = require("morgan");
 const User = require("./models/User");
 const Permission = require("./models/Permission");
 
@@ -37,10 +38,16 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 const app = express();
+app.use(morgan('combined'));
+
 app.use(cors({
   origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
+
+app.options('*', cors());
 
 app.use(bodyParser.json());
 

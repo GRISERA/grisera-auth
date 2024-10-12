@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.3.0",
     "mongoose": "^7.0.5",
+    "morgan": "^1.10.0",
     "retry": "^0.13.1"
   }
 }
