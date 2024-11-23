@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
-const User = require("./models/User");
 const Permission = require("./models/Permission");
 
 const connectWithRetry = () => {
@@ -21,7 +20,6 @@ const connectWithRetry = () => {
 
       if (dbExists) {
         console.log('Database exists.');
-        await User.createIndexes();
         await Permission.createIndexes();
       } else {
         console.log('Database does not exist.');
@@ -52,10 +50,7 @@ app.options('*', cors());
 app.use(bodyParser.json());
 
 app.use('/api/permissions', require('./endpoints/permissions'));
-app.use('/api/register', require('./endpoints/register'));
-app.use('/api/login', require('./endpoints/login'));
 app.use('/api/health', require('./endpoints/health'));
-app.use('/api/users', require('./endpoints/users'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
