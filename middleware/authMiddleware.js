@@ -1,4 +1,20 @@
 const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
+
+const client = jwksClient({
+  jwksUri: process.env.JWKS_URL
+});
+
+function getKey(header, callback){
+  client.getSigningKey(header.kid, function(error, key) {
+    if (error) {
+      console.error(error)
+    } else {
+      const signingKey = key.publicKey || key.rsaPublicKey;
+      callback(null, signingKey);
+    }
+  });
+}
 
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization.substr('Bearer '.length);
@@ -7,7 +23,7 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: 'No token provided.' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, getKey, (err, decoded) => {
     if (err) {
       return res.status(403).json({ message: 'Failed to authenticate token.' });
     }
