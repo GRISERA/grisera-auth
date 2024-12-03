@@ -51,6 +51,7 @@ app.use(bodyParser.json());
 
 app.use('/api/permissions', require('./endpoints/permissions'));
 app.use('/api/health', require('./endpoints/health'));
+app.use('/api/users', require('./endpoints/users'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
