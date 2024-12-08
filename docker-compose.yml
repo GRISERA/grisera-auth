@@ -24,9 +24,12 @@ services:
     ports:
       - "8081:3000"
     environment:
-      - JWKS_URL=http://keycloak:8080/realms/grisera/protocol/openid-connect/certs
+      - KEYCLOAK_URL=http://keycloak:8080
+      - REALM=grisera
       - DB_URL=mongodb://user:password@mongodb:27017/auth?authSource=admin
       - DB_NAME=auth
+      - CLIENT_ID=grisera-auth
+      - CLIENT_SECRET=1HtHJPFnsReotU6unJkkl2RHsbytXZ31
 
   mongodb:
     image: mongo
