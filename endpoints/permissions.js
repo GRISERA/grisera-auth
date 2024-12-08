@@ -21,6 +21,28 @@ router.get('/:id',async(req, res) => {
     }
 });
 
+router.post('/', async(req, res) => {
+    try {
+        const existingPermission = await Permission.findOne({
+            userId: req.body.userId,
+            datasetId: req.body.datasetId,
+        });
+
+        if (existingPermission) {
+            return res.status(400).json({ error: 'Permission already exist' });
+        }
+
+        const permission = new Permission(req.body);
+
+        await permission.save();
+
+        res.status(201).json(permission);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 router.get('/dataset/:datasetId', async(req, res) => {
     try {
         const { datasetId } = req.params;
