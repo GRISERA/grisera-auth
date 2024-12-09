@@ -24,7 +24,7 @@ router.get('/:id',async(req, res) => {
 router.post('/', async(req, res) => {
     try {
         const existingPermission = await Permission.findOne({
-            userId: req.body.userId,
+            userId: req.userId,
             datasetId: req.body.datasetId,
         });
 
@@ -32,7 +32,11 @@ router.post('/', async(req, res) => {
             return res.status(400).json({ error: 'Permission already exist' });
         }
 
-        const permission = new Permission(req.body);
+        const permission = new Permission({
+            userId: req.userId,
+            datasetId: req.body.datasetId,
+            role: req.body.role
+        });
 
         await permission.save();
 
