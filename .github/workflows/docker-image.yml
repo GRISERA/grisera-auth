@@ -7,11 +7,11 @@ name: Docker deploy
 
 on:
   push:
-    branches: [ "development_1.x" ]
+    branches: [ "development_2.1" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ "development_1.x" ]
+    branches: [ "development_2.1" ]
 
 env:
   # Use docker.io for Docker Hub if empty
