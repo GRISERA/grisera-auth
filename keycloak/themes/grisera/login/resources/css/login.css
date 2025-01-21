@@ -107,3 +107,19 @@ a {
     border-color: #ff5252;;
     box-shadow: 0 0 8px rgba(255, 82, 82, 0.25);
 }
+
+.checkbox {
+    text-align: right;
+}
+
+.checkbox label {
+    display: inline-flex;
+    justify-content: flex-end;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.checkbox input[type="checkbox"] {
+    margin-right: 16px;
+    accent-color: #043865;
+}

@@ -3,11 +3,12 @@
 <#import "register-commons.ftl" as registerCommons>
 <@layout.registrationLayout displayMessage=messagesPerField.exists('global') displayRequiredFields=true; section>
     <#if section = "header">
-        <#if messageHeader??>
-            ${kcSanitize(msg("${messageHeader}"))?no_esc}
-        <#else>
-            ${msg("registerTitle")}
-        </#if>
+        <div>
+            <h3>Welcome!</h3>
+                <span class="title-caption">
+                        ${msg("registerTitle")}
+        </span>
+            </div>
     <#elseif section = "form">
         <form id="kc-register-form" class="${properties.kcFormClass!}" action="${url.registrationAction}" method="post">
 
