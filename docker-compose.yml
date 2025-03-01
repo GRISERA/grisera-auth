@@ -24,9 +24,12 @@ services:
     ports:
       - "8081:3000"
     environment:
-      - JWT_SECRET=jwtsecret
+      - KEYCLOAK_URL=http://keycloak:8080
+      - REALM=grisera
       - DB_URL=mongodb://user:password@mongodb:27017/auth?authSource=admin
       - DB_NAME=auth
+      - CLIENT_ID=grisera-auth
+      - CLIENT_SECRET=1HtHJPFnsReotU6unJkkl2RHsbytXZ31
 
   mongodb:
     image: mongo
@@ -54,5 +57,33 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: user
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
 
+  keycloak:
+    image: keycloak/keycloak:26.1
+    command: start-dev --import-realm --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+    volumes:
+      - ./keycloak/realm-config:/opt/keycloak/data/import
+      - ./keycloak/themes:/opt/keycloak/themes/
+    ports:
+      - "8090:8080"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
 volumes:
   mongodbdata:
+  postgresdata:

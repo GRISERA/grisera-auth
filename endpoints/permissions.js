@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Permission = require('../models/Permission');
 const authMiddleware = require('../middleware/authMiddleware');
-const jwt = require('jsonwebtoken');
 
 router.use('/', authMiddleware);
 
@@ -25,7 +24,7 @@ router.get('/:id',async(req, res) => {
 router.post('/', async(req, res) => {
     try {
         const existingPermission = await Permission.findOne({
-            userId: req.body.userId,
+            userId: req.userId,
             datasetId: req.body.datasetId,
         });
 
@@ -33,27 +32,15 @@ router.post('/', async(req, res) => {
             return res.status(400).json({ error: 'Permission already exist' });
         }
 
-        const permission = new Permission(req.body);
+        const permission = new Permission({
+            userId: req.userId,
+            datasetId: req.body.datasetId,
+            role: req.body.role
+        });
 
         await permission.save();
 
-        if (req.body.userId === req.user.userId){
-            const permissions = await Permission.find({ userId: req.body.userId });
-
-            const newToken = jwt.sign({
-                userId: req.user.userId,
-                email: req.user.email,
-                permissions: permissions,
-            },
-                process.env.JWT_SECRET, {
-                    expiresIn: "1d",
-                }
-            );
-
-            res.status(201).send({token: newToken});
-        } else {
-            res.status(201).json(permission);
-        }
+        res.status(201).json(permission);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Server error' });
