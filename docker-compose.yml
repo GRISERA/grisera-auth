@@ -13,10 +13,11 @@ services:
       - REALM=grisera
       - PERMISSIONS_ENDPOINT=http://auth-ms:3000/api/permissions
       - CLIENT_SECRET=6UkCrp7UqFy78vh5TVhkaYP0OuVagNTd
-
+      - CLIENT_ID=grisera-api
+      - VERIFY_ISS=False
 
   frontend-ms:
-    image: ghcr.io/grisera/grisera-ui:2.1.2
+    image: ghcr.io/grisera/grisera-ui:2.1.4
     depends_on:
       - auth-ms
       - grisera_api_mongodb
@@ -41,7 +42,7 @@ services:
       - KEYCLOAK_URL=http://keycloak:8080
       - REALM=grisera
       - CLIENT_ID=grisera-auth
-      - CLIENT_SECRET=1HtHJPFnsReotU6unJkkl2RHsbytXZ31
+      - CLIENT_SECRET=1FrVLc5QFTDNvrJVNvJdqkeWkcpulPJZ
 
   keycloak:
     build:
@@ -90,7 +91,7 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
 
   postgres:
-    image: postgres:latest
+    image: postgres
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
