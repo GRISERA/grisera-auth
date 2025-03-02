@@ -1,21 +1,33 @@
 version: "3.9" # optional since v1.27.0
 services:
   grisera_api_mongodb:
-    image: maczomen/grisera_core_mongo:0.2.3
+    image: ghcr.io/grisera/grisera-core-mongo:2.1.1
     ports:
-      - "18085:80"
+      - "8085:80"
     environment:
-      - MONGO_API_HOST=user:password@mongodb
+      - MONGO_API_HOST=mongodb
       - MONGO_API_PORT=27017
-      - TIMEOUT=300
+      - MONGO_API_USER=user
+      - MONGO_API_PASSWORD=password
+      - KEYCLOAK_SERVER=http://keycloak:8080
+      - REALM=grisera
+      - PERMISSIONS_ENDPOINT=http://auth-ms:3000/api/permissions
+      - CLIENT_SECRET=6UkCrp7UqFy78vh5TVhkaYP0OuVagNTd
+
 
   frontend-ms:
-    image: maczomen/grisera_ui:0.4.5
+    image: ghcr.io/grisera/grisera-ui:2.1.2
+    depends_on:
+      - auth-ms
+      - grisera_api_mongodb
     ports:
-      - "8080:8080"
+      - "3000:80"
     environment:
+      - VUE_APP_API_URL=http://localhost:8085
       - VUE_APP_AUTH_MS_URL=http://localhost:8081/api
-      - VUE_APP_API_URL=http://localhost:18085
+      - VUE_APP_KEYCLOAK_URL=http://localhost:8090
+      - VUE_APP_KEYCLOAK_CLIENT_ID=grisera-ui
+      - VUE_APP_KEYCLOAK_REALM=grisera
 
   auth-ms:
     build:
@@ -24,12 +36,32 @@ services:
     ports:
       - "8081:3000"
     environment:
-      - KEYCLOAK_URL=http://keycloak:8080
-      - REALM=grisera
       - DB_URL=mongodb://user:password@mongodb:27017/auth?authSource=admin
       - DB_NAME=auth
+      - KEYCLOAK_URL=http://keycloak:8080
+      - REALM=grisera
       - CLIENT_ID=grisera-auth
       - CLIENT_SECRET=1HtHJPFnsReotU6unJkkl2RHsbytXZ31
+
+  keycloak:
+    build:
+      context: .
+      dockerfile: prod.dockerfile
+    depends_on:
+      - postgres
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+    volumes:
+      - ./keycloak/realm-config:/opt/keycloak/data/import
+      - ./keycloak/themes:/opt/keycloak/themes/
+    ports:
+      - "8090:8080"
 
   mongodb:
     image: mongo
@@ -56,25 +88,6 @@ services:
       ME_CONFIG_MONGODB_AUTH_DATABASE: admin
       ME_CONFIG_MONGODB_ADMINUSERNAME: user
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
-
-  keycloak:
-    image: keycloak/keycloak:26.1
-    command: start-dev --import-realm --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_URL_HOST: postgres
-      KC_DB_URL_DATABASE: keycloak
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: password
-    volumes:
-      - ./keycloak/realm-config:/opt/keycloak/data/import
-      - ./keycloak/themes:/opt/keycloak/themes/
-    ports:
-      - "8090:8080"
-    depends_on:
-      - postgres
 
   postgres:
     image: postgres:latest
