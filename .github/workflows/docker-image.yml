@@ -16,6 +16,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  KEYCLOAK_IMAGE_NAME: ${{ github.repository }}-keycloak
 
 
 jobs:
@@ -69,7 +70,7 @@ jobs:
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
+      - name: Extract Docker metadata for auth-ms
         id: meta
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
@@ -78,10 +79,17 @@ jobs:
             type=semver,pattern={{version}},value=${{ steps.version_bump.outputs.new_tag }}
             2.1-latest
 
+      - name: Extract Docker metadata for keycloak
+        id: keycloak-meta
+        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.KEYCLOAK_IMAGE_NAME }}
+          tags: type=semver,pattern={{version}},value=${{ steps.version_bump.outputs.new_tag }}
+
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
-        id: build-and-push
+        id: auth-ms-build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: .
@@ -89,3 +97,15 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        id: keycloak-build-and-push
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          context: .
+          file: keycloak.dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.keycloak-meta.outputs.tags }}
+          labels: ${{ steps.keycloak-meta.outputs.labels }}
