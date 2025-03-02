@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
+const keycloakUrl = process.env.KEYCLOAK_URL ?? 'http://localhost:8090';
+const realm = process.env.REALM ?? 'grisera';
 
 const client = jwksClient({
-  jwksUri: `${process.env.KEYCLOAK_URL}/realms/${process.env.REALM}/protocol/openid-connect/certs`
+  jwksUri: `${keycloakUrl}/realms/${realm}/protocol/openid-connect/certs`
 });
 
 function getKey(header, callback){
