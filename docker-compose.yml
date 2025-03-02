@@ -46,7 +46,7 @@ services:
   keycloak:
     build:
       context: .
-      dockerfile: prod.dockerfile
+      dockerfile: keycloak.dockerfile
     depends_on:
       - postgres
     environment:
