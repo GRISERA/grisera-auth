@@ -120,6 +120,13 @@
       "serviceAccountClientId": "grisera-auth",
       "disableableCredentialTypes": [],
       "requiredActions": [],
+      "clientRoles": {
+        "realm-management": [
+          "view-users",
+          "manage-users",
+          "query-users"
+        ]
+      },
       "notBefore": 0
     }
   ],
