@@ -11,6 +11,7 @@ function getKey(header, callback){
   client.getSigningKey(header.kid, function(error, key) {
     if (error) {
       console.error(error)
+      callback(error, null);
     } else {
       const signingKey = key.publicKey || key.rsaPublicKey;
       callback(null, signingKey);
