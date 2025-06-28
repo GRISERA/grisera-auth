@@ -24,7 +24,7 @@ router.get('/:id',async(req, res) => {
 router.post('/', async(req, res) => {
     try {
         const existingPermission = await Permission.findOne({
-            userId: req.userId,
+            userId: req.body.userId,
             datasetId: req.body.datasetId,
         });
 
@@ -33,7 +33,7 @@ router.post('/', async(req, res) => {
         }
 
         const permission = new Permission({
-            userId: req.userId,
+            userId:  req.body.userId,
             datasetId: req.body.datasetId,
             role: req.body.role
         });

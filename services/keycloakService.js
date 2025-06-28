@@ -19,7 +19,9 @@ async function getClientToken() {
     }
 
     const json = await response.json();
-    return json.access_token;
+    const token = json.access_token;
+    console.log(`Retrieved token ${token}`)
+    return token
 }
 
 async function getUsers() {
