@@ -1,4 +1,23 @@
 const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
+const keycloakUrl = process.env.KEYCLOAK_URL ?? 'http://localhost:8090';
+const realm = process.env.REALM ?? 'grisera';
+
+const client = jwksClient({
+  jwksUri: `${keycloakUrl}/realms/${realm}/protocol/openid-connect/certs`
+});
+
+function getKey(header, callback){
+  client.getSigningKey(header.kid, function(error, key) {
+    if (error) {
+      console.error(error)
+      callback(error, null);
+    } else {
+      const signingKey = key.publicKey || key.rsaPublicKey;
+      callback(null, signingKey);
+    }
+  });
+}
 
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization.substr('Bearer '.length);
@@ -7,12 +26,13 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: 'No token provided.' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, getKey, (err, decoded) => {
     if (err) {
       return res.status(403).json({ message: 'Failed to authenticate token.' });
     }
 
     req.user = decoded;
+    req.userId = decoded['sub']
     next();
   });
 };
